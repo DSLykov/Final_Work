@@ -12,15 +12,14 @@ YANDEX_DISK_CREATE_FOLDER_URL = "https://cloud-api.yandex.net/v1/disk/resources"
 
 
 class VK:
-    def __init__(self, access_token, user_id):
+    def __init__(self, access_token):
         self.token = access_token
-        self.user_id = user_id
         self.params = {"access_token": self.token, "v": VK_API_VERSION}
 
-    def get_profile_photos(self, album_id="profile", count=5):
+    def get_profile_photos(self, user_id, album_id="profile", count=5):
         url = "https://api.vk.com/method/photos.get"
         params = {
-            "owner_id": self.user_id,
+            "owner_id": user_id,
             "album_id": album_id,
             "extended": 1,
             "photo_sizes": 1,
@@ -53,7 +52,7 @@ class YandexDisk:
 def save_photos_to_disk(
     vk_token, vk_user_id, yandex_token, folder_name="VK_Photos", photo_count=5
 ):
-    vk = VK(vk_token, vk_user_id)
+    vk = VK(vk_token)
     yandex = YandexDisk(yandex_token)
 
     # Создаем папку на Яндекс.Диске
@@ -62,7 +61,7 @@ def save_photos_to_disk(
         return
 
     # Получаем фотографии с профиля VK
-    photos = vk.get_profile_photos(count=photo_count)
+    photos = vk.get_profile_photos(vk_user_id, count=photo_count)
     if "error" in photos:
         print(f"Ошибка при получении фотографий: {photos['error']['error_msg']}")
         return
